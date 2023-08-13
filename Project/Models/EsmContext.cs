@@ -63,7 +63,7 @@ public partial class EsmContext : DbContext
         modelBuilder.Entity<LevelOfLanguage>(entity =>
         {
             entity
-                .HasNoKey()
+               // .HasNoKey()
                 .ToTable("LevelOfLanguage", "EM");
 
             entity.Property(e => e.Id).HasColumnName("id");
@@ -79,17 +79,17 @@ public partial class EsmContext : DbContext
         modelBuilder.Entity<LineOfAccount>(entity =>
         {
             entity
-                .HasNoKey()
+               // .HasNoKey()
                 .ToTable("LineOfAccount", "EM");
 
             entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Language)
+            entity.Property(e => e.Account)
                 .HasMaxLength(50)
                 .IsUnicode(false);
-            entity.Property(e => e.Languagelevel)
+            entity.Property(e => e.Lineofbusiness)
                 .HasMaxLength(10)
                 .IsUnicode(false)
-                .HasColumnName("languagelevel");
+                .HasColumnName("Lineofbusiness");
         });
 
         modelBuilder.Entity<Login>(entity =>

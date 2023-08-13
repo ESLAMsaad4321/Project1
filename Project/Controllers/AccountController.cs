@@ -1,19 +1,23 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Project.Models;
 using Project.Services.EmployeeServices;
 
 namespace Project.Controllers
 {
+    [Authorize]
+
     [Route("api/[controller]")]
     [ApiController]
-    public class EmployeeController : ControllerBase
+    public class AccountController : ControllerBase
     {
-        private readonly IEmployeeServices _Context;
-        public EmployeeController(IEmployeeServices context)
+        private readonly IAccountServices _Context;
+        public AccountController(IAccountServices context)
         {
             _Context = context; 
         }
+        
         [HttpGet]
         public async Task<ActionResult<List<Account>>> GetAccounts()
         {
