@@ -95,7 +95,7 @@ public partial class EsmContext : DbContext
         modelBuilder.Entity<Login>(entity =>
         {
             entity
-                .HasNoKey()
+                //.HasNoKey()
                 .ToTable("Login", "EM");
 
             entity.Property(e => e.Emil)
@@ -106,7 +106,7 @@ public partial class EsmContext : DbContext
                 .IsUnicode(false)
                 .HasColumnName("password");
             entity.Property(e => e.Security)
-                .HasMaxLength(10)
+                .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasColumnName("security");
             entity.Property(e => e.UserId)

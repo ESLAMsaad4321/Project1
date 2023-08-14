@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Project.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -12,29 +14,44 @@ namespace Project.Controllers
     {
         public static Login1 Login = new Login1();
         private readonly IConfiguration _configuration;
+        private readonly EsmContext _Context;
 
-        public AdminController(IConfiguration configuration)
+
+        public AdminController(IConfiguration configuration, EsmContext context)
         {
 
             _configuration = configuration;
+            _Context = context;
         }
       
             [HttpPost("register")]
-        public ActionResult<Login1> Regestier(Login requist)
+        public async Task<ActionResult<Login1>> Regestier(Login requist)
         {
+
             string passwordHash = BCrypt.Net.BCrypt.HashPassword(requist.Password);
-
             Login.Emil = requist.Emil;
-
             Login.PasswordHash = passwordHash;
 
+            var res = new Login();
+            
+            res.Emil = requist.Emil;
+            res.Password = requist.Password;
+            res.UserId = requist.UserId;
+            res.Security = requist.Security;
+            _Context.Logins.Add(res);
+            await _Context.SaveChangesAsync();
+            return Login;
 
 
-            return Ok(Login);
+
+
         }
         [HttpPost("login")]
         public ActionResult<Login1> log(Login requist)
         {
+            string passwordHash = BCrypt.Net.BCrypt.HashPassword(requist.Password);
+            Login.Emil = requist.Emil;
+            Login.PasswordHash = passwordHash;
             if (Login.Emil != requist.Emil)
             {
                 return BadRequest("Wrong Email");
