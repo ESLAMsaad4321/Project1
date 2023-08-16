@@ -12,5 +12,8 @@ public partial class Login
     [Key]
     public int UserId { get; set; }
 
-    public string Security { get; set; } = null!;
+    public byte[]? Security { get; set; }
+    public byte[]? PasswordHash { get; set; }
+
+    public byte[]? PasswordSalt { get; set; }
 }

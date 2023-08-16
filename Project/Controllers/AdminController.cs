@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Project.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Project.Controllers
@@ -23,64 +26,58 @@ namespace Project.Controllers
             _configuration = configuration;
             _Context = context;
         }
-      
-            [HttpPost("register")]
-        public async Task<ActionResult<Login1>> Regestier(Login requist)
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Regestier(log requist)
         {
-
-            string passwordHash = BCrypt.Net.BCrypt.HashPassword(requist.Password);
-            Login.Emil = requist.Emil;
-            Login.PasswordHash = passwordHash;
-
+            if (_Context.Logins.Any(u => u.Emil == requist.Email))
+            {
+                return BadRequest("User already exists.");
+            }
+            var count = 1;
+            CreatePasswordHash(requist.Password, out byte[] passwordHash, out byte[] passwordSalt);
+            
+            Login.Emil= requist.Email;
+            Login.PasswordHash= passwordHash;
+            Login.PasswordSalt= passwordSalt;
+            
             var res = new Login();
             
-            res.Emil = requist.Emil;
+            res.Emil = requist.Email;
             res.Password = requist.Password;
-            res.UserId = requist.UserId;
-            res.Security = requist.Security;
+            res.UserId = count++;
+            res.Security = passwordSalt;
+            res.PasswordHash = passwordHash;
+            res.PasswordSalt = passwordSalt;
             _Context.Logins.Add(res);
             await _Context.SaveChangesAsync();
-            return Login;
-
-
-
-
+            return Ok(Login);
         }
         [HttpPost("login")]
-        public ActionResult<Login1> log(Login requist)
+       
+        public async Task<IActionResult> log(Logrequest requist)
         {
-            string passwordHash = BCrypt.Net.BCrypt.HashPassword(requist.Password);
-            Login.Emil = requist.Emil;
-            Login.PasswordHash = passwordHash;
-            if (Login.Emil != requist.Emil)
+            var user = await _Context.Logins.FirstOrDefaultAsync(u => u.Emil == requist.Email);
+            if (user == null)
             {
-                return BadRequest("Wrong Email");
+                return BadRequest("User not found.");
             }
-
-            if (!BCrypt.Net.BCrypt.Verify(requist.Password,Login.PasswordHash))
+            if (!VerifyPasswordHash(requist.Password, user.PasswordHash, user.PasswordSalt))
             {
-                return BadRequest("Wrong Password");
+                return BadRequest("Password is incorrect.");
             }
-            string Token =CreateToken(Login);
+            string Token = CreateToken(requist);
             return Ok(Token);
         }
-        private string CreateToken(Login1 tok)
+
+        private string CreateToken(Logrequest tok)
         {
             List<Claim> claims = new List<Claim>()
             {
-                new Claim(ClaimTypes.Name,tok.Emil),
+                new Claim(ClaimTypes.Name,tok.Email),
   
             };
-            /*
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("AppSetting:Token").Value!));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
-            var Token = new JwtSecurityToken(
-                claims: claims,
-                expires: DateTime.Now.AddYears(1),
-                signingCredentials: creds);
-            var JWT =new JwtSecurityTokenHandler().WriteToken(Token);
-            return (JWT);
-            */
+          
             var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
             var creds = new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256Signature);
 
@@ -90,50 +87,28 @@ namespace Project.Controllers
                 expires: DateTime.Now.AddDays(10), //temprarly for now
                 claims: claims,
                 signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
-  );
+    );
             var JWT = new JwtSecurityTokenHandler().WriteToken(tokenItem);
             return (JWT);
         }
+        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+        {
+            using (var hmac = new HMACSHA512())
+            {
+                passwordSalt = hmac.Key;
+                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            }
+        }
 
-        /*
-         [HttpGet]
-         public async Task<ActionResult<List<Login>>> GetAccounts()
-         {
-             return await _Context.GetAccounts();
-         }
-         [HttpGet("{UserId}")]
-         public async Task<ActionResult<Login>> GetAccountsById(int UserId)
-         {
-             var result = await _Context.GetAccountsById(UserId);
-             if (result is null)
-                 return NotFound("Sorry Not Found");
-
-             return Ok(result);
-         }
-
-         [HttpPut("{UserId}")]
-         public async Task<ActionResult<List<Login>>> UpdateAccount(int UserId, Login requist)
-         {
-             var result = await _Context.UpdateAccount(UserId, requist);
-             if (result is null)
-                 return NotFound("Sorry Not Found");
-
-             return Ok(result);
-         }
-         [HttpDelete("{UserId}")]
-
-         public async Task<ActionResult<List<Login>>> DeleteAccount(int UserId)
-         {
-             var result = await _Context.DeleteAccount(UserId);
-             if (result is null)
-                 return NotFound("Sorry Not Found");
-
-             return Ok(result);
-         }
-        */
-
-
+        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
+        {
+            using (var hmac = new HMACSHA512(passwordSalt))
+            {
+                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                return computedHash.SequenceEqual(passwordHash);
+            }
+        }
     }
- }
+}
         
       

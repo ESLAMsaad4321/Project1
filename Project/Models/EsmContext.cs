@@ -106,12 +106,11 @@ public partial class EsmContext : DbContext
                 .IsUnicode(false)
                 .HasColumnName("password");
             entity.Property(e => e.Security)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .IsUnicode(false)
                 .HasColumnName("security");
             entity.Property(e => e.UserId)
-                .HasMaxLength(10)
-                .IsUnicode(false)
+                .HasAnnotation("SqlServer:Identity","1,1")
                 .HasColumnName("user_id");
         });
 
