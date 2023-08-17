@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace Project.Models;
-
-public partial class Login
+namespace Project.Models
 {
-    public string Emil { get; set; } = null!;
-
-    public string Password { get; set; } = null!;
-    [Key]
-    public int UserId { get; set; }
-
-    public byte[]? Security { get; set; }
-    public byte[]? PasswordHash { get; set; }
-
-    public byte[]? PasswordSalt { get; set; }
+    public class Login
+    {
+        [Required, EmailAddress]
+        public string Email { get; set; } = string.Empty;
+        [Required, MinLength(6, ErrorMessage = "Please enter at least 6 characters, dude!")]
+        public string Password { get; set; } = string.Empty;
+        [Required, Compare("Password")]
+        public string ConfirmPassword { get; set; } = string.Empty;
+    }
 }

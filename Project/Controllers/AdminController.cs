@@ -15,7 +15,6 @@ namespace Project.Controllers
     [ApiController]
     public class AdminController : Controller
     {
-        public static Login1 Login = new Login1();
         private readonly IConfiguration _configuration;
         private readonly EsmContext _Context;
 
@@ -28,45 +27,37 @@ namespace Project.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Regestier(log requist)
+        public async Task<IActionResult> Regestier(Login request)
         {
-            if (_Context.Logins.Any(u => u.Emil == requist.Email))
+            if (_Context.Admin.Any(u => u.Email == request.Email))
             {
                 return BadRequest("User already exists.");
             }
-            var count = 1;
-            CreatePasswordHash(requist.Password, out byte[] passwordHash, out byte[] passwordSalt);
-            
-            Login.Emil= requist.Email;
-            Login.PasswordHash= passwordHash;
-            Login.PasswordSalt= passwordSalt;
-            
-            var res = new Login();
-            
-            res.Emil = requist.Email;
-            res.Password = requist.Password;
-            res.UserId = count++;
-            res.Security = passwordSalt;
-            res.PasswordHash = passwordHash;
-            res.PasswordSalt = passwordSalt;
-            _Context.Logins.Add(res);
+            CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
+            var user = new Admin
+            {
+                Email = request.Email,
+                PasswordHash = passwordHash,
+                PasswordSalt = passwordSalt
+            };
+            _Context.Admin.Add(user);
             await _Context.SaveChangesAsync();
-            return Ok(Login);
+            return Ok("done");
         }
         [HttpPost("login")]
        
-        public async Task<IActionResult> log(Logrequest requist)
+        public async Task<IActionResult> LogIn(Logrequest request)
         {
-            var user = await _Context.Logins.FirstOrDefaultAsync(u => u.Emil == requist.Email);
+            var user = await _Context.Admin.FirstOrDefaultAsync(u => u.Email == request.Email);
             if (user == null)
             {
                 return BadRequest("User not found.");
             }
-            if (!VerifyPasswordHash(requist.Password, user.PasswordHash, user.PasswordSalt))
+            if (!VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
             {
                 return BadRequest("Password is incorrect.");
             }
-            string Token = CreateToken(requist);
+            string Token = CreateToken(request);
             return Ok(Token);
         }
 
@@ -87,7 +78,7 @@ namespace Project.Controllers
                 expires: DateTime.Now.AddDays(10), //temprarly for now
                 claims: claims,
                 signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
-    );
+                                                    );
             var JWT = new JwtSecurityTokenHandler().WriteToken(tokenItem);
             return (JWT);
         }

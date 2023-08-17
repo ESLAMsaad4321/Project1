@@ -21,7 +21,7 @@ public partial class EsmContext : DbContext
 
     public virtual DbSet<LineOfAccount> LineOfAccounts { get; set; }
 
-    public virtual DbSet<Login> Logins { get; set; }
+    public virtual DbSet<Admin> Admin { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
@@ -92,23 +92,15 @@ public partial class EsmContext : DbContext
                 .HasColumnName("Lineofbusiness");
         });
 
-        modelBuilder.Entity<Login>(entity =>
+        modelBuilder.Entity<Admin>(entity =>
         {
             entity
                 //.HasNoKey()
-                .ToTable("Login", "EM");
+                .ToTable("Admin", "EM");
 
-            entity.Property(e => e.Emil)
+            entity.Property(e => e.Email)
                 .HasMaxLength(25)
                 .IsUnicode(false);
-            entity.Property(e => e.Password)
-                .HasMaxLength(20)
-                .IsUnicode(false)
-                .HasColumnName("password");
-            entity.Property(e => e.Security)
-                .HasMaxLength(100)
-                .IsUnicode(false)
-                .HasColumnName("security");
             entity.Property(e => e.UserId)
                 .HasAnnotation("SqlServer:Identity","1,1")
                 .HasColumnName("user_id");
