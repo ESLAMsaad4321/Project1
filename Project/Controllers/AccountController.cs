@@ -6,9 +6,8 @@ using Project.Services.EmployeeServices;
 
 namespace Project.Controllers
 {
-    [Authorize]
-
-    [Route("api/[controller]")]
+   
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class AccountController : ControllerBase
     {

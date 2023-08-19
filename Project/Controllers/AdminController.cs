@@ -1,4 +1,5 @@
 ﻿using Azure.Core;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +12,8 @@ using System.Text;
 
 namespace Project.Controllers
 {
-    [Route("api/[controller]")]
+    [Authorize]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class AdminController : Controller
     {
@@ -99,6 +101,7 @@ namespace Project.Controllers
                 return computedHash.SequenceEqual(passwordHash);
             }
         }
+        
     }
 }
         
