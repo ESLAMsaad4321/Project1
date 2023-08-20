@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using NuGet.Common;
 using ProjectMVC.Models;
 using System.Diagnostics;
 using System.Reflection;
@@ -9,25 +10,80 @@ namespace ProjectMVC.Controllers
 {
     public class HomeController : Controller
     {
-        /*
+       
         Uri baseAddress = new Uri("http://localhost:64957/api");
         private readonly HttpClient _Client;
-        public HomeController()
-        {
-            _Client = new HttpClient();
-        }    */
-    
         private readonly ILogger<HomeController> _logger;
 
         public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
+            _Client = new HttpClient();
         }
+        public IActionResult Index(AdminLoginViewModel model)
+        {
+            try
+            {
+                string data = JsonConvert.SerializeObject(model);
+                StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
+                HttpResponseMessage response = _Client.PostAsync(baseAddress + "/Admin/LogIn/login", content).Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    string token = response.Content.ReadAsStringAsync().Result;
+                    TempData["sucess massege"] = "done";
+                    HttpContext.Session.SetString("JWT", token);
+                    return Redirect("~/Account/Index");
+                }
 
-        public IActionResult Index()
+            }
+            catch (Exception ex)
+            {
+                TempData["error massege"] = ex.Message;
+                return View();
+
+            }
+            return View();
+        }
+        public IActionResult logout()
+        {
+            HttpContext.Session.Clear();
+            return Redirect("~/Home/Index");
+        }
+        public IActionResult done()
         {
             return View();
         }
+
+        [HttpGet]
+        public IActionResult Create()
+        {
+            return View();
+        }
+        [HttpPost]
+        public IActionResult Create(AdminRegisterViewModel model)
+        {
+            try
+            {
+                string data = JsonConvert.SerializeObject(model);
+                StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
+                HttpResponseMessage response = _Client.PostAsync(baseAddress + "/Admin/Regestier/register", content).Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    TempData["sucess massege"] = "Admin Added";
+                    return RedirectToAction("done");
+                }
+               
+            }
+            catch (Exception ex)
+            {
+                TempData["error massege"] = ex.Message;
+                return View();
+
+            }
+            return View();
+        }
+
+
         /*
         public async Task<IActionResult> LoginUser(Admin user)
         {

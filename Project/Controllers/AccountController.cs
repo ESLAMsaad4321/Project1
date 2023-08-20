@@ -6,7 +6,7 @@ using Project.Services.EmployeeServices;
 
 namespace Project.Controllers
 {
-   
+    [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class AccountController : ControllerBase
@@ -16,7 +16,7 @@ namespace Project.Controllers
         {
             _Context = context; 
         }
-        
+     
         [HttpGet]
         public async Task<ActionResult<List<Account>>> GetAccounts()
         {
