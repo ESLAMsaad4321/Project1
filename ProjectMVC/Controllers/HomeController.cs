@@ -10,6 +10,7 @@ namespace ProjectMVC.Controllers
 {
     public class HomeController : Controller
     {
+
        
         Uri baseAddress = new Uri("http://localhost:64957/api");
         private readonly HttpClient _Client;

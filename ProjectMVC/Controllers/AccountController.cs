@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using ProjectMVC.Models;
 using System.Collections.Generic;
@@ -9,13 +10,14 @@ using System.Text.Json.Serialization;
 
 namespace ProjectMVC.Controllers
 {
+
     public class AccountController : Controller
     {
         Uri baseAddress = new Uri("http://localhost:64957/api");
         private readonly HttpClient _Client;
         public AccountController()
         {
-            _Client = new HttpClient();
+            _Client = new HttpClient(new HttpClientHandler() { UseDefaultCredentials=true});
             _Client.BaseAddress = baseAddress;
             
         }
@@ -23,8 +25,6 @@ namespace ProjectMVC.Controllers
         
         public IActionResult Index()
         {
-            var accesstoken=HttpContext.Session.GetString("JWT");
-            _Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accesstoken);
             List<AccountViewModel> Account = new List<AccountViewModel>();
             HttpResponseMessage response = _Client.GetAsync(baseAddress + "/Account/GetAccounts").Result;
             if (response.IsSuccessStatusCode)
@@ -47,8 +47,6 @@ namespace ProjectMVC.Controllers
         {
             try
             {
-                var accesstoken = HttpContext.Session.GetString("JWT");
-                _Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accesstoken);
                 string data = JsonConvert.SerializeObject(model);
                 StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
                 HttpResponseMessage response = _Client.PostAsync(baseAddress + "/Account/AddAccount", content).Result;
@@ -71,14 +69,13 @@ namespace ProjectMVC.Controllers
         {
             try
             {
-                var accesstoken = HttpContext.Session.GetString("JWT");
-                _Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accesstoken);
-                List<AccountViewModel> Account = new List<AccountViewModel>();
+                
+                AccountViewModel Account = new AccountViewModel();
                 HttpResponseMessage response = _Client.GetAsync(baseAddress + "/Account/GetAccountsById/" + id).Result;
                 if (response.IsSuccessStatusCode)
                 {
                     string data = response.Content.ReadAsStringAsync().Result;
-                    Account = JsonConvert.DeserializeObject<List<AccountViewModel>>(data);
+                    Account = JsonConvert.DeserializeObject<AccountViewModel>(data);
                 }
                 return View(Account);
 
@@ -95,8 +92,7 @@ namespace ProjectMVC.Controllers
         {
             try
             {
-                var accesstoken = HttpContext.Session.GetString("JWT");
-                _Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accesstoken);
+                
                 AccountViewModel account = new AccountViewModel();
                 HttpResponseMessage response = _Client.GetAsync(baseAddress + "/Account/GetAccountsById/" + id).Result;
                 if (response.IsSuccessStatusCode)
@@ -120,8 +116,7 @@ namespace ProjectMVC.Controllers
         {
             try
             {
-                var accesstoken = HttpContext.Session.GetString("JWT");
-                _Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accesstoken);
+               
                 string data = JsonConvert.SerializeObject(model);
                 StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
                 HttpResponseMessage response = _Client.PutAsync(baseAddress + "/Account/UpdateAccount/" + id, content).Result;
@@ -143,8 +138,6 @@ namespace ProjectMVC.Controllers
         {
             try
             {
-                var accesstoken = HttpContext.Session.GetString("JWT");
-                _Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accesstoken);
                 AccountViewModel account = new AccountViewModel();
                 HttpResponseMessage response = _Client.GetAsync(baseAddress + "/Account/GetAccountsById/" + id).Result;
                 if (response.IsSuccessStatusCode)
@@ -166,8 +159,7 @@ namespace ProjectMVC.Controllers
         {
             try
             {
-                var accesstoken = HttpContext.Session.GetString("JWT");
-                _Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accesstoken);
+                
                 HttpResponseMessage response = _Client.DeleteAsync(baseAddress + "/Account/DeleteAccount/" + id).Result;
                 if (response.IsSuccessStatusCode)
                 {

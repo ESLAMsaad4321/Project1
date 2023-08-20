@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Amazon.CloudFront.Model;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Project.Models;
@@ -7,6 +9,7 @@ using Project.Services.EmployeeServices;
 namespace Project.Controllers
 {
     [Authorize]
+    [EnableCors("default")]
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class AccountController : ControllerBase

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ProjectMVC.Models.AccountViewModel>
+﻿@model ProjectMVC.Models.AccountViewModel
 
 @{
     ViewData["Title"] = "Search";
@@ -44,40 +44,40 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Name)
+                @Html.DisplayFor(model => model.Name)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Id)
+                @Html.DisplayFor(model => model.Id)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Nationalid)
+                @Html.DisplayFor(model => model.Nationalid)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Dateofbirth)
+                @Html.DisplayFor(model => model.Dateofbirth)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Language)
+                @Html.DisplayFor(model => model.Language)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Languagelevel)
+                @Html.DisplayFor(model => model.Languagelevel)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Account1)
+                @Html.DisplayFor(model => model.Account1)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Lineofbusiness)
+                @Html.DisplayFor(model => model.Lineofbusiness)
             </td>
             <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary">Edit</a>
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
+             
+
+                <a asp-action="Edit" asp-route-id="" class="btn btn-primary">Edit</a>
+                <a asp-action="Delete" asp-route-id="@Html." class="btn btn-danger">Delete</a>
+                
+
             </td>
         </tr>
-        }
-    </tbody>
-</table>
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
