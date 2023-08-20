@@ -17,7 +17,7 @@ namespace ProjectMVC.Controllers
         private readonly HttpClient _Client;
         public AccountController()
         {
-            _Client = new HttpClient(new HttpClientHandler() { UseDefaultCredentials=true});
+            _Client = new HttpClient();
             _Client.BaseAddress = baseAddress;
             
         }
@@ -25,6 +25,9 @@ namespace ProjectMVC.Controllers
         
         public IActionResult Index()
         {
+            var accesstoken = HttpContext.Session.GetString("JWT");
+            _Client.DefaultRequestHeaders.Clear();
+            _Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             List<AccountViewModel> Account = new List<AccountViewModel>();
             HttpResponseMessage response = _Client.GetAsync(baseAddress + "/Account/GetAccounts").Result;
             if (response.IsSuccessStatusCode)
@@ -38,8 +41,6 @@ namespace ProjectMVC.Controllers
         [HttpGet]
         public IActionResult Create() 
         {
-            var accesstoken = HttpContext.Session.GetString("JWT");
-            _Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accesstoken);
             return View();
         }
         [HttpPost]

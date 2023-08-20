@@ -1,4 +1,5 @@
 ﻿using Amazon.CloudFront.Model;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -9,9 +10,10 @@ using Project.Services.EmployeeServices;
 namespace Project.Controllers
 {
     [Authorize]
-    [EnableCors("default")]
+    [EnableCors("CorsPolicy")]
     [Route("api/[controller]/[action]")]
-    [ApiController]
+    [ApiController] 
+
     public class AccountController : ControllerBase
     {
         private readonly IAccountServices _Context;

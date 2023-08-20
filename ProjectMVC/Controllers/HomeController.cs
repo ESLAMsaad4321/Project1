@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using NuGet.Common;
 using ProjectMVC.Models;
 using System.Diagnostics;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
 
@@ -21,6 +22,12 @@ namespace ProjectMVC.Controllers
             _logger = logger;
             _Client = new HttpClient();
         }
+        [HttpGet]
+        public IActionResult Index()
+        {
+            return View();
+        }
+            [HttpPost]
         public IActionResult Index(AdminLoginViewModel model)
         {
             try
@@ -28,13 +35,14 @@ namespace ProjectMVC.Controllers
                 string data = JsonConvert.SerializeObject(model);
                 StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
                 HttpResponseMessage response = _Client.PostAsync(baseAddress + "/Admin/LogIn/login", content).Result;
-                if (response.IsSuccessStatusCode)
+                string token = response.Content.ReadAsStringAsync().Result;
+                HttpContext.Session.SetString("JWT", token);
+                if (token!=null)
                 {
-                    string token = response.Content.ReadAsStringAsync().Result;
-                    TempData["sucess massege"] = "done";
-                    HttpContext.Session.SetString("JWT", token);
+                    var accesstoken = HttpContext.Session.GetString("JWT");
                     return Redirect("~/Account/Index");
                 }
+                
 
             }
             catch (Exception ex)

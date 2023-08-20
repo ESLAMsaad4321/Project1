@@ -18,12 +18,13 @@ builder.Services.AddControllers().AddNewtonsoftJson();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddCors(o => o.AddPolicy("default", builder =>
-                {
-    builder.AllowAnyOrigin()
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy",
+        builder => builder.AllowAnyOrigin()
             .AllowAnyMethod()
-            .AllowAnyHeader();
-           }));
+            .AllowAnyHeader());
+});
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -81,7 +82,6 @@ builder.Services.AddAuthentication(options =>
                 builder.Configuration.Bind("CookieSettings", options);
             });
 
-
 builder.Services.AddDbContext<EsmContext>();
 builder.Services.AddScoped<IAccountServices, AccountServices>();
 builder.Services.AddScoped<ILineOfAccountServices, LineOfAccountServices>();
@@ -94,11 +94,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseCors("DemoCorsPolicy");
+app.UseCors("CorsPolicy");
+
 
 app.UseHttpsRedirection();
-app.UseAuthentication();
 app.UseAuthorization();
+app.UseAuthentication();
 
 app.MapControllers();
 

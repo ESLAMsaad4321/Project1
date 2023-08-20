@@ -21,8 +21,9 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-// Authorization Middleware
-// Add header:
+
+app.UseAuthorization();
+app.UseSession();
 app.Use((context, next) =>
 {
     context.Request.Headers["Authorization"] = context.Session.GetString("JWT") == null ? "" : context.Session.GetString("JWT");
@@ -30,10 +31,8 @@ app.Use((context, next) =>
 });
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-app.UseSession();
 app.UseRouting();
 
-app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
