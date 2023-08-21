@@ -47,7 +47,7 @@ namespace Project.Controllers
             return Ok("done");
         }
         [HttpPost("login")]
-       
+
         public async Task<IActionResult> LogIn(Logrequest request)
         {
             var user = await _Context.Admin.FirstOrDefaultAsync(u => u.Email == request.Email);
@@ -60,7 +60,7 @@ namespace Project.Controllers
                 return BadRequest("Password is incorrect.");
             }
             string Token = CreateToken(request);
-            return Ok(Token);
+            return Ok(new {Token});
         }
 
         private string CreateToken(Logrequest tok)
@@ -70,17 +70,15 @@ namespace Project.Controllers
                 new Claim(ClaimTypes.Name,tok.Email),
   
             };
-          
-            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
-            var creds = new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256Signature);
 
+            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
             var tokenItem = new JwtSecurityToken(
                 issuer: _configuration["JWT:ValidIssuer"],
                 audience: _configuration["JWT:ValidAudience"],
                 expires: DateTime.Now.AddDays(10), //temprarly for now
                 claims: claims,
                 signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
-                                                    );
+  );
             var JWT = new JwtSecurityTokenHandler().WriteToken(tokenItem);
             return (JWT);
         }

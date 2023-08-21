@@ -21,17 +21,24 @@ namespace ProjectMVC.Controllers
             _Client.BaseAddress = baseAddress;
             
         }
+        private void AddTokenHeader()
+        {
+            string? authToken = HttpContext.Session.GetString("JWT");
+            _Client.DefaultRequestHeaders.Clear();
+            _Client.DefaultRequestHeaders.Add("Authorization", "Bearer "+ authToken);
+        }
         [HttpGet]
         
         public IActionResult Index()
         {
-            var accesstoken = HttpContext.Session.GetString("JWT");
-            _Client.DefaultRequestHeaders.Clear();
+            AddTokenHeader();
             _Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
             List<AccountViewModel> Account = new List<AccountViewModel>();
             HttpResponseMessage response = _Client.GetAsync(baseAddress + "/Account/GetAccounts").Result;
             if (response.IsSuccessStatusCode)
             {
+
                 string data = response.Content.ReadAsStringAsync().Result;
                 Account = JsonConvert.DeserializeObject<List<AccountViewModel>>(data);
             }
@@ -48,6 +55,8 @@ namespace ProjectMVC.Controllers
         {
             try
             {
+                AddTokenHeader();
+
                 string data = JsonConvert.SerializeObject(model);
                 StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
                 HttpResponseMessage response = _Client.PostAsync(baseAddress + "/Account/AddAccount", content).Result;

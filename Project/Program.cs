@@ -31,7 +31,7 @@ builder.Services.AddSwaggerGen(options =>
     options.SwaggerDoc("v1", new OpenApiInfo
     {
         Version = "v1",
-        Title = "Employee"
+        Title = "ERP API"
     });
     options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
@@ -54,8 +54,8 @@ builder.Services.AddSwaggerGen(options =>
                 }
             },
             new string[]{}
-        }
-    });
+     }
+});
 });
 builder.Services.AddAuthentication(options =>
 {
@@ -98,8 +98,9 @@ app.UseCors("CorsPolicy");
 
 
 app.UseHttpsRedirection();
-app.UseAuthorization();
 app.UseAuthentication();
+
+app.UseAuthorization();
 
 app.MapControllers();
 

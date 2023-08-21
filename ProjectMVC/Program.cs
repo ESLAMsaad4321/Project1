@@ -22,13 +22,17 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseAuthorization();
 app.UseSession();
+
+//Authorization Middleware
+// Add header:
 app.Use((context, next) =>
 {
     context.Request.Headers["Authorization"] = context.Session.GetString("JWT") == null ? "" : context.Session.GetString("JWT");
     return next.Invoke();
-});
+}); app.UseRouting();
+
+app.UseAuthorization();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();

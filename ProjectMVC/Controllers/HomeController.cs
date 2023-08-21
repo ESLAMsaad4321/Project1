@@ -35,15 +35,22 @@ namespace ProjectMVC.Controllers
                 string data = JsonConvert.SerializeObject(model);
                 StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
                 HttpResponseMessage response = _Client.PostAsync(baseAddress + "/Admin/LogIn/login", content).Result;
-                string token = response.Content.ReadAsStringAsync().Result;
-                HttpContext.Session.SetString("JWT", token);
-                if (token!=null)
+                if (response.IsSuccessStatusCode)
                 {
-                    var accesstoken = HttpContext.Session.GetString("JWT");
-                    return Redirect("~/Account/Index");
-                }
-                
+                    string responseContent = response.Content.ReadAsStringAsync().Result;
 
+                    // Deserialize the response content to extract the token
+                    var tokenResponse = JsonConvert.DeserializeObject<Dictionary<string, string>>(responseContent);
+
+                    if (tokenResponse.TryGetValue("token", out string token))
+                    {
+                        token =token.Replace('"',' ');
+
+                        HttpContext.Session.SetString("JWT", token);
+                        return Redirect("~/Account/Index");
+                    }
+                    return RedirectToAction("Index");
+                }
             }
             catch (Exception ex)
             {
