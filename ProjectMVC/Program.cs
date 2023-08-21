@@ -5,13 +5,11 @@ using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
+builder.Services.AddHttpClient();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddSession(Option =>
-{
-    Option.IdleTimeout = TimeSpan.FromMinutes(20);
-});
+builder.Services.AddSession();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -21,22 +19,19 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-
+app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseSession();
 
 //Authorization Middleware
 // Add header:
 app.Use((context, next) =>
 {
-    context.Request.Headers["Authorization"] = context.Session.GetString("JWT") == null ? "" : context.Session.GetString("JWT");
+    context.Request.Headers["Authorization"] = context.Session.GetString("Authorization") == null ? "" : context.Session.GetString("Authorization");
     return next.Invoke();
-}); app.UseRouting();
-
-app.UseAuthorization();
-app.UseHttpsRedirection();
-app.UseStaticFiles();
+}); 
 app.UseRouting();
-
+app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",

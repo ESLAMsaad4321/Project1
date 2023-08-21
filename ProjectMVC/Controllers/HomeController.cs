@@ -13,7 +13,7 @@ namespace ProjectMVC.Controllers
     {
 
        
-        Uri baseAddress = new Uri("http://localhost:64957/api");
+        Uri baseAddress = new Uri("https://localhost:7154/api");
         private readonly HttpClient _Client;
         private readonly ILogger<HomeController> _logger;
 
@@ -44,8 +44,6 @@ namespace ProjectMVC.Controllers
 
                     if (tokenResponse.TryGetValue("token", out string token))
                     {
-                        token =token.Replace('"',' ');
-
                         HttpContext.Session.SetString("JWT", token);
                         return Redirect("~/Account/Index");
                     }

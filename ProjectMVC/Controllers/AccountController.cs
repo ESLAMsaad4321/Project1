@@ -13,11 +13,11 @@ namespace ProjectMVC.Controllers
 
     public class AccountController : Controller
     {
-        Uri baseAddress = new Uri("http://localhost:64957/api");
+        Uri baseAddress = new Uri("https://localhost:7154/api");
         private readonly HttpClient _Client;
-        public AccountController()
+        public AccountController(IHttpClientFactory httpClientFactory)
         {
-            _Client = new HttpClient();
+            _Client = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true });
             _Client.BaseAddress = baseAddress;
             
         }
@@ -40,7 +40,7 @@ namespace ProjectMVC.Controllers
             {
 
                 string data = response.Content.ReadAsStringAsync().Result;
-                Account = JsonConvert.DeserializeObject<List<AccountViewModel>>(data);
+                Account = JsonConvert.DeserializeObject<List<AccountViewModel>>(data) ?? new();
             }
             return View(Account);
         }
@@ -56,7 +56,6 @@ namespace ProjectMVC.Controllers
             try
             {
                 AddTokenHeader();
-
                 string data = JsonConvert.SerializeObject(model);
                 StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
                 HttpResponseMessage response = _Client.PostAsync(baseAddress + "/Account/AddAccount", content).Result;
@@ -79,7 +78,8 @@ namespace ProjectMVC.Controllers
         {
             try
             {
-                
+                AddTokenHeader();
+
                 AccountViewModel Account = new AccountViewModel();
                 HttpResponseMessage response = _Client.GetAsync(baseAddress + "/Account/GetAccountsById/" + id).Result;
                 if (response.IsSuccessStatusCode)
@@ -102,7 +102,8 @@ namespace ProjectMVC.Controllers
         {
             try
             {
-                
+                AddTokenHeader();
+
                 AccountViewModel account = new AccountViewModel();
                 HttpResponseMessage response = _Client.GetAsync(baseAddress + "/Account/GetAccountsById/" + id).Result;
                 if (response.IsSuccessStatusCode)
@@ -126,7 +127,8 @@ namespace ProjectMVC.Controllers
         {
             try
             {
-               
+                AddTokenHeader();
+
                 string data = JsonConvert.SerializeObject(model);
                 StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
                 HttpResponseMessage response = _Client.PutAsync(baseAddress + "/Account/UpdateAccount/" + id, content).Result;
@@ -148,6 +150,8 @@ namespace ProjectMVC.Controllers
         {
             try
             {
+                AddTokenHeader();
+
                 AccountViewModel account = new AccountViewModel();
                 HttpResponseMessage response = _Client.GetAsync(baseAddress + "/Account/GetAccountsById/" + id).Result;
                 if (response.IsSuccessStatusCode)
@@ -169,7 +173,8 @@ namespace ProjectMVC.Controllers
         {
             try
             {
-                
+                AddTokenHeader();
+
                 HttpResponseMessage response = _Client.DeleteAsync(baseAddress + "/Account/DeleteAccount/" + id).Result;
                 if (response.IsSuccessStatusCode)
                 {
