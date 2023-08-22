@@ -13,7 +13,7 @@ namespace ProjectMVC.Controllers
 
     public class AccountController : Controller
     {
-        Uri baseAddress = new Uri("https://localhost:7154/api");
+        Uri baseAddress = new Uri("https://localhost:44349/api");
         private readonly HttpClient _Client;
         public AccountController(IHttpClientFactory httpClientFactory)
         {
@@ -85,7 +85,7 @@ namespace ProjectMVC.Controllers
                 if (response.IsSuccessStatusCode)
                 {
                     string data = response.Content.ReadAsStringAsync().Result;
-                    Account = JsonConvert.DeserializeObject<AccountViewModel>(data);
+                    Account = JsonConvert.DeserializeObject<AccountViewModel>(data) ?? new();
                 }
                 return View(Account);
 
@@ -109,7 +109,7 @@ namespace ProjectMVC.Controllers
                 if (response.IsSuccessStatusCode)
                 {
                     string data = response.Content.ReadAsStringAsync().Result;
-                    account = JsonConvert.DeserializeObject<AccountViewModel>(data);
+                    account = JsonConvert.DeserializeObject<AccountViewModel>(data) ?? new();
                 }
                 return View(account);
 
@@ -157,7 +157,7 @@ namespace ProjectMVC.Controllers
                 if (response.IsSuccessStatusCode)
                 {
                     string data = response.Content.ReadAsStringAsync().Result;
-                    account = JsonConvert.DeserializeObject<AccountViewModel>(data);
+                    account = JsonConvert.DeserializeObject<AccountViewModel>(data) ?? new();
                 }
                 return View(account);
 

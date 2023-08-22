@@ -13,16 +13,16 @@ namespace ProjectMVC.Controllers
     {
 
        
-        Uri baseAddress = new Uri("https://localhost:7154/api");
+        Uri baseAddress = new Uri("https://localhost:44349/api");
         private readonly HttpClient _Client;
-        private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController()
         {
-            _logger = logger;
-            _Client = new HttpClient();
+            _Client = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true });
+
+            _Client.BaseAddress = baseAddress;
         }
-        [HttpGet]
+    [HttpGet]
         public IActionResult Index()
         {
             return View();
@@ -35,6 +35,7 @@ namespace ProjectMVC.Controllers
                 string data = JsonConvert.SerializeObject(model);
                 StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
                 HttpResponseMessage response = _Client.PostAsync(baseAddress + "/Admin/LogIn/login", content).Result;
+
                 if (response.IsSuccessStatusCode)
                 {
                     string responseContent = response.Content.ReadAsStringAsync().Result;
@@ -49,6 +50,7 @@ namespace ProjectMVC.Controllers
                     }
                     return RedirectToAction("Index");
                 }
+
             }
             catch (Exception ex)
             {
